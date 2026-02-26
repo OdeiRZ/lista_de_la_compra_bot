@@ -29,11 +29,9 @@ default_checklist = {
 		"Pan de sándwich", "Palitos de frutos secos", "Bollitos de leche", 
 		"Napolitana", "Pan", "Tila/Infusión", "Sopas",
 		"Pipas aquasal", "Cacahuetes", "Cacahuetes desgrasado", "Pistachos", "Nueces",
-		"Lasaña", "Tiras de pollo", "Tortilla de patatas", "Piña" 
+		"Lasaña", "Tiras de pollo", "Tortilla de patatas", "Piña"
 	],
-    " ": [],
 	"ALDI": ["Albóndigas de Soja", "Cereales 0%", "Queso Havarti", "Casera de Limón", "Gyozas de pollo"],
-    " ": [],
     "CARREFOUR": ["Patatas/Picoteo", "Monsters", "Mosto blanco"]
 }
 
