@@ -14,23 +14,7 @@ STATE_FILE = "state.json"
 
 # Lista inicial (si no existe state.json)
 default_checklist = {
-    "MERCADONA": [
-		"Arena aglomerante", "Papel higiénico", "Toallitas culo", "Bolsas de basura", "Lavavajillas", "Pato WC", 
-		"Nidos de pasta (al huevo)", "Hélices de pasta", 
-		"Lágrima artificial", "Bastoncillos", "Enjuague bucal", "Pasta de dientes", 
-		"Filetes de pavo", "Jamón extrafino", "Jamón ibérico", "Bacon", "Chorizo de pavo", "Pavo", "Queso mozarella", "Queso mozarella light", "Queso tierno", "Queso cuña",
-		"Plátanos", "Manzanas", "Patatas", "Pimiento verde", "Zanahorias", "Guacamole", 
-		"Chocolate Nestlé", "Helados de cono grandes", "Helados de cono chicos", 
-		"Patatas gajo", "Patatas corte grueso", "Batatas congeladas", "Ñoquis congelados", "Pimiento congelado", "Cebolla congelada", "Ajo congelado",
-		"Agua", "Monster", "Coca-cola zero", "Mosto tinto",
-		"Salsa barbacoa", "Salsa de soja", "Tomate", "Atún", "Aceitunas",
-		"Pollitos crunchy", "Bases de pizza", "Hielo",
-		"Yogur natural", "Yogur edulcorado", "Batido +proteinas", "Leche proteica",
-		"Pan de sándwich", "Palitos de frutos secos", "Bollitos de leche", 
-		"Napolitana", "Pan", "Tila/Infusión", "Sopas",
-		"Pipas aquasal", "Cacahuetes", "Cacahuetes desgrasado", "Pistachos", "Nueces",
-		"Lasaña", "Tiras de pollo", "Tortilla de patatas", "Piña" 
-	],
+    "MERCADONA": ["Arena aglomerante", "Papel higiénico", "Toallitas culo", "Bolsas de basura", "Lavavajillas", "Pato WC", "Nidos de pasta (al huevo)", "Hélices de pasta", "Lágrima artificial", "Bastoncillos", "Enjuague bucal", "Pasta de dientes", "Filetes de pavo", "Jamón extrafino", "Jamón ibérico", "Bacon", "Chorizo de pavo", "Pavo", "Queso mozarella", "Queso mozarella light", "Queso tierno", "Queso cuña", "Plátanos", "Manzanas", "Patatas", "Pimiento verde", "Zanahorias", "Guacamole", "Chocolate Nestlé", "Helados de cono grandes", "Helados de cono chicos", "Patatas gajo", "Patatas corte grueso", "Batatas congeladas", "Ñoquis congelados", "Pimiento congelado", "Cebolla congelada", "Ajo congelado", "Agua", "Monster", "Coca-cola zero", "Mosto tinto", "Salsa barbacoa", "Salsa de soja", "Tomate", "Atún", "Aceitunas", "Pollitos crunchy", "Bases de pizza", "Hielo", "Yogur natural", "Yogur edulcorado", "Batido +proteinas", "Leche proteica", "Pan de sándwich", "Palitos de frutos secos", "Bollitos de leche", "Napolitana", "Pan", "Tila/Infusión", "Sopas", "Pipas aquasal", "Cacahuetes", "Cacahuetes desgrasado", "Pistachos", "Nueces", "Lasaña", "Tiras de pollo", "Tortilla de patatas", "Piña"],
 	"ALDI": ["Albóndigas de Soja", "Cereales 0%", "Queso Havarti", "Casera de Limón", "Gyozas de pollo"],
     "CARREFOUR": ["Patatas/Picoteo", "Monsters", "Mosto blanco"]
 }
