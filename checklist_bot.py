@@ -1,80 +1,122 @@
-import logging
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+import json
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
+import os
 
-# Logging
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO
-)
-logger = logging.getLogger(__name__)
+# Token desde variable de entorno (para Railway)
+TOKEN = os.environ.get("8268360976:AAHXbvHk16UTcnsZs0XoeQlklrmX1j18674")
+if not TOKEN:
+    print("Error: pon tu TOKEN como variable de entorno 'TOKEN'")
+    exit(1)
 
-# Token del bot
-TOKEN = "8268360976:AAHXbvHk16UTcnsZs0XoeQlklrmX1j18674"
+# Archivo donde se guardarÃ¡ la lista y estado
+STATE_FILE = "state.json"
 
-# Lista de la compra
-SHOPPING_LIST = {
-    "Lácteos": ["Leche", "Yogur", "Mantequilla"],
-    "Huevos y derivados": ["Huevos", "Queso"],
-    "Panadería": ["Pan", "Bollería"],
-    "Frutas": ["Manzanas", "Plátanos", "Naranjas"],
-    "Verduras": ["Tomate", "Lechuga", "Zanahoria"],
-    "Otros": ["Aceite", "Azúcar", "Sal"]
+# Lista inicial (si no existe state.json)
+default_checklist = {
+    "Lacteos": ["Leche", "Yogur"],
+    "Verduras": ["Tomates", "Pimientos"],
+    "Otros": ["Pan", "Huevos"]
 }
 
-# Estado inicial
-state = {item: False for category in SHOPPING_LIST.values() for item in category}
+# Cargar lista y estado
+if os.path.exists(STATE_FILE):
+    with open(STATE_FILE, "r") as f:
+        data = json.load(f)
+        checklist = data["checklist"]
+        state = data["state"]
+else:
+    checklist = default_checklist
+    state = {item: False for section in checklist.values() for item in section}
 
+# Construye teclado inline
+def build_keyboard():
+    buttons = []
+    for section, items in checklist.items():
+        buttons.append([InlineKeyboardButton(f"--- {section} ---", callback_data="section")])
+        for item in items:
+            prefix = "âœ…" if state[item] else "â¬œ"
+            buttons.append([InlineKeyboardButton(f"{prefix} {item}", callback_data=item)])
+    return InlineKeyboardMarkup(buttons)
 
+# Guardar en JSON
+def save_state():
+    with open(STATE_FILE, "w") as f:
+        json.dump({"checklist": checklist, "state": state}, f)
+
+# /start crea o actualiza el mensaje
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Mostrar lista de la compra con botones."""
-    keyboard = [
-        [InlineKeyboardButton(f"{'✅' if state[item] else '⬜'} {item}", callback_data=item)]
-        for category in SHOPPING_LIST.values() for item in category
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Lista de la compra:", reply_markup=reply_markup)
+    await update.message.reply_text(
+        "ðŸ›’ Lista de la compra",
+        reply_markup=build_keyboard()
+    )
 
-
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Togglear estado del item."""
+# Toggle checkbox
+async def toggle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
     item = query.data
-    state[item] = not state[item]
+    if item != "section":
+        state[item] = not state[item]
+        save_state()
+        await query.edit_message_reply_markup(reply_markup=build_keyboard())
 
-    keyboard = [
-        [InlineKeyboardButton(f"{'✅' if state[i] else '⬜'} {i}", callback_data=i)]
-        for category in SHOPPING_LIST.values() for i in category
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text(text="Lista de la compra:", reply_markup=reply_markup)
-
-
-async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Resetear lista a todos sin marcar."""
-    for item in state:
+# AÃ±adir nuevo item a una secciÃ³n
+async def add_item(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        text = update.message.text
+        # Formato: /add SecciÃ³n | Item
+        if "|" not in text:
+            await update.message.reply_text("Formato: /add SecciÃ³n | Item")
+            return
+        section, item = [x.strip() for x in text.split("|", 1)]
+        if section not in checklist:
+            checklist[section] = []
+        checklist[section].append(item)
         state[item] = False
+        save_state()
+        await update.message.reply_text(f"Item '{item}' aÃ±adido a '{section}'")
+    except Exception as e:
+        await update.message.reply_text(f"Error: {e}")
 
-    keyboard = [
-        [InlineKeyboardButton(f"⬜ {i}", callback_data=i)]
-        for category in SHOPPING_LIST.values() for i in category
-    ]
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await update.message.reply_text("Lista reseteada:", reply_markup=reply_markup)
+# Quitar item
+async def remove_item(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        text = update.message.text
+        # Formato: /remove Item
+        item = text.replace("/remove", "").strip()
+        found = False
+        for section, items in checklist.items():
+            if item in items:
+                items.remove(item)
+                found = True
+                break
+        if found:
+            state.pop(item, None)
+            save_state()
+            await update.message.reply_text(f"Item '{item}' eliminado")
+        else:
+            await update.message.reply_text(f"Item '{item}' no encontrado")
+    except Exception as e:
+        await update.message.reply_text(f"Error: {e}")
 
+# Mensaje normal para listar la lista
+async def show_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    msg = "ðŸ›’ Lista de la compra:\n"
+    for section, items in checklist.items():
+        msg += f"\n--- {section} ---\n"
+        for item in items:
+            prefix = "âœ…" if state[item] else "â¬œ"
+            msg += f"{prefix} {item}\n"
+    await update.message.reply_text(msg)
 
-def main():
-    """Ejecutar bot."""
-    app = ApplicationBuilder().token(TOKEN).build()
-
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("reset", reset))
-    app.add_handler(CallbackQueryHandler(button))
-
-    # Arrancar polling
-    app.run_polling()
-
-
+# Main
 if __name__ == "__main__":
-    main()
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CallbackQueryHandler(toggle))
+    app.add_handler(CommandHandler("add", add_item))
+    app.add_handler(CommandHandler("remove", remove_item))
+    app.add_handler(CommandHandler("list", show_list))
+    print("Bot corriendo...")
+    app.run_polling()
