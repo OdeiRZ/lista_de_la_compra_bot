@@ -4,8 +4,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandle
 import os
 
 # Token desde variable de entorno (para Railway)
-asdasd
-TOKEN = "8268360976:AAHXbvHk16UTcnsZs0XoeQlklrmX1j18674"
+TOKEN = os.environ.get("TOKEN")
 if not TOKEN:
     print("Error: pon tu TOKEN como variable de entorno 'TOKEN'")
     exit(1)
@@ -121,5 +120,3 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("list", show_list))
     print("Bot corriendo...")
     app.run_polling()
-
-
