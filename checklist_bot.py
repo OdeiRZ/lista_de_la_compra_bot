@@ -1,12 +1,7 @@
 import os
 import json
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
-from telegram.ext import (
-    ApplicationBuilder,
-    CommandHandler,
-    CallbackQueryHandler,
-    ContextTypes
-)
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 
 # TOKEN desde variable de entorno
 TOKEN = os.environ.get("TOKEN")
@@ -31,7 +26,6 @@ if os.path.exists(STATE_FILE):
         state = data["state"]
 else:
     checklist = default_checklist
-    # ✅ CORRECTO: diccionario por comprensión con llaves cerradas
     state = {item: False for section in checklist.values() for item in section}
 
 # Construir teclado inline
@@ -68,39 +62,33 @@ async def toggle(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # /add Sección | Item
 async def add_item(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        text = update.message.text
-        if "|" not in text:
-            await update.message.reply_text("Formato: /add Sección | Item")
-            return
-        section, item = [x.strip() for x in text.split("|", 1)]
-        if section not in checklist:
-            checklist[section] = []
-        checklist[section].append(item)
-        state[item] = False
-        save_state()
-        await update.message.reply_text(f"Item '{item}' añadido a '{section}'")
-    except Exception as e:
-        await update.message.reply_text(f"Error: {e}")
+    text = update.message.text
+    if "|" not in text:
+        await update.message.reply_text("Formato: /add Sección | Item")
+        return
+    section, item = [x.strip() for x in text.split("|", 1)]
+    if section not in checklist:
+        checklist[section] = []
+    checklist[section].append(item)
+    state[item] = False
+    save_state()
+    await update.message.reply_text(f"Item '{item}' añadido a '{section}'")
 
 # /remove Item
 async def remove_item(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        item = update.message.text.replace("/remove", "").strip()
-        found = False
-        for section, items in checklist.items():
-            if item in items:
-                items.remove(item)
-                found = True
-                break
-        if found:
-            state.pop(item, None)
-            save_state()
-            await update.message.reply_text(f"Item '{item}' eliminado")
-        else:
-            await update.message.reply_text(f"Item '{item}' no encontrado")
-    except Exception as e:
-        await update.message.reply_text(f"Error: {e}")
+    item = update.message.text.replace("/remove", "").strip()
+    found = False
+    for section, items in checklist.items():
+        if item in items:
+            items.remove(item)
+            found = True
+            break
+    if found:
+        state.pop(item, None)
+        save_state()
+        await update.message.reply_text(f"Item '{item}' eliminado")
+    else:
+        await update.message.reply_text(f"Item '{item}' no encontrado")
 
 # /list
 async def show_list(update: Update, context: ContextTypes.DEFAULT_TYPE):
