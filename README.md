@@ -1,6 +1,6 @@
-# Lista_de_Compra_Bot
+# Lista_de_la_compra_Bot
 
-Bot Lista_de_Compra 0.1
+Bot Lista_de_la_compra 0.1
 =========================================
 
 Aplicación desarrollada en Python que implementa un bot de telegram utilizado
