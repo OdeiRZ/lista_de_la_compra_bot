@@ -5,7 +5,7 @@ Bot Lista_de_la_compra 0.1
 
 Aplicación desarrollada en Python que implementa un bot de telegram utilizado
 para mostrar/administrar una lista de la compra en formato checkbox con múltiples
-opciones seleccionables/deseleccionables...
+opciones seleccionables/deseleccionables..
 
 ## Requisitos
  [Telegram], [Python], etc..
